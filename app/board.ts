@@ -19,16 +19,16 @@ export class Board  {
     let tile = event.tile;
     switch(tile.piece.state) {
       case "none":
-      this.game.handleNoneClicked(tile);
+      this.game.selectPiece(tile.coords());
       break;
       case "selected":
-      this.game.handleSelectedClicked(tile);
+      this.game.unselectAll();
       break;
       case "available":
-      this.game.handleAvailableClicked(tile);
+      this.game.movePiece(tile.coords());
       break;
       case "attacked":
-      this.game.handleAttackedClicked(tile);
+      this.game.capturePiece(tile.coords());
       break;
     }
   }

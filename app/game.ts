@@ -1,9 +1,9 @@
 import { Piece, Side, Type } from './piece';
-import { Tile } from './tile';
+import { Coords } from './common';
 
 export class Game  { 
     positions: Piece[][] = Piece.START_POSITIONS;
-    selected: Tile = undefined;
+    selected: Coords;
     captured: {[side: string]: Piece[]} = {};
     won: string;
 
@@ -12,29 +12,30 @@ export class Game  {
       this.captured[Piece.side_to_string(Side.BLACK)] = [];
     }
 
-    handleNoneClicked(tile: Tile) {
-      if (!tile.piece.canBeSelected()) {
+    selectPiece(c: Coords) {
+      let piece = this.positions[c.x][c.y];
+      if (!piece.canBeSelected()) {
         return;
       }
       this.unselectAll();
-      tile.piece.state = "selected";
-      this.selected = tile;
-      if (tile.x >= 0) {
-        this.updateAvailableOrAttacked(tile);
+      piece.state = "selected";
+      this.selected = c;
+      if (c.x >= 0) {
+        this.updateAvailableOrAttacked(c);
       } else {
         this.updateAllEmptyToAvailable();
       }
     }
 
-    updateAvailableOrAttacked(tile: Tile) {
-      let piece = tile.piece;
-      for (let pos of tile.piece.movements()) {
-        let x = tile.x + pos[0];
-        let y = tile.y + pos[1];
-        if (this.isOutOfBounds(x, y)) {
+    updateAvailableOrAttacked(c: Coords) {
+      let piece = this.positions[c.x][c.y];
+      for (let pos of piece.movements()) {
+        let x2 = c.x + pos[0];
+        let y2 = c.y + pos[1];
+        if (this.isOutOfBounds(x2, y2)) {
           continue;
         }
-        let otherPiece = this.positions[x][y];
+        let otherPiece = this.positions[x2][y2];
         if (otherPiece.side == Side.NONE) {
           otherPiece.state = "available";
         } else if (otherPiece.side == piece.side) {
@@ -49,41 +50,38 @@ export class Game  {
       return x < 0 || x >= this.positions.length || y < 0 || y >= this.positions[0].length;
     }
 
-    handleSelectedClicked(tile: Tile) {
-      this.unselectAll();
-    }
-
-    handleAvailableClicked(tile: Tile) {
-      let movedPiece = this.selected.piece;
+    movePiece(c: Coords) {
+      let piece = this.positions[c.x][c.y];
+      let movedPiece = this.positions[this.selected.x][this.selected.y];
       if (this.selected.x >= 0) {
-        let movedToPiece = tile.piece;
-        this.positions[tile.x][tile.y] = this.positions[this.selected.x][this.selected.y];
+        let movedToPiece = piece;
+        this.positions[c.x][c.y] = this.positions[this.selected.x][this.selected.y];
         this.positions[this.selected.x][this.selected.y] = movedToPiece;
       } else {
         let side = this.selected.x == -1 ? Side.WHITE : Side.BLACK;
-        this.positions[tile.x][tile.y] = movedPiece;
+        this.positions[c.x][c.y] = movedPiece;
         this.captured[Piece.side_to_string(side)].splice(this.selected.y, 1);
       }
       this.unselectAll();
-      this.onPieceMoved(tile, movedPiece);
+      this.onPieceMoved(c, movedPiece);
     }
 
-    handleAttackedClicked(tile: Tile) {
-      let movedPiece = this.selected.piece;
-      let moveToPiece = tile.piece;
-      this.positions[tile.x][tile.y] = movedPiece;
+    capturePiece(c: Coords) {
+      let movedPiece = this.positions[this.selected.x][this.selected.y];
+      let moveToPiece = this.positions[c.x][c.y];
+      this.positions[c.x][c.y] = movedPiece;
       this.positions[this.selected.x][this.selected.y] = Piece.EMPTY;
       this.captured[Piece.side_to_string(movedPiece.side)].push(moveToPiece.getOpposite());
       this.unselectAll();
-      this.onPieceMoved(tile, movedPiece);
+      this.onPieceMoved(c, movedPiece);
       this.onPieceCaptured(moveToPiece, movedPiece.side);
     }
 
-    onPieceMoved(tile: Tile, piece: Piece) {
+    onPieceMoved(c: Coords, piece: Piece) {
       if (piece.type == Type.KING) {    
-        if (tile.x == 0 && piece.side == Side.WHITE) {
+        if (c.x == 0 && piece.side == Side.WHITE) {
           this.gameOver(Side.WHITE);
-        } else if (tile.x == this.positions.length-1 && piece.side == Side.BLACK) {
+        } else if (c.x == this.positions.length-1 && piece.side == Side.BLACK) {
           this.gameOver(Side.BLACK);
         }
       }

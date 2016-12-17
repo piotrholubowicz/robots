@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Piece, Side, Type } from './piece';
+import { Coords } from './common';
 
 @Component({
   moduleId: module.id,
@@ -13,6 +14,10 @@ export class Tile  {
   @Input() y: number;
 
   @Output() clicked = new EventEmitter<TileClickedEvent>();
+
+  coords(): Coords {
+    return new Coords(this.x, this.y);
+  }
 
   tileClicked() {
     this.clicked.emit(new TileClickedEvent(this));
