@@ -36,6 +36,7 @@
       rxjs: {
         defaultExtension: 'js'
       }
-    }
+    },
+    baseURL: '/robots/'
   });
 })(this);
