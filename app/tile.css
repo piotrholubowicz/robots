@@ -1,0 +1,23 @@
+div {
+    width: 100px;
+    height: 100px;
+}
+div.none {
+    margin: 3px;
+}
+div:hover {
+    border: 3px solid #ddf;
+    margin: 0px;
+}
+div.selected {
+    border: 3px solid #00f;
+    margin: 0px;    
+}
+div.available {
+    border: 3px solid #0f0;
+    margin: 0px;    
+}
+div.attacked {
+    border: 3px solid #f00;
+    margin: 0px;    
+}

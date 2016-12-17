@@ -1,0 +1,28 @@
+<div>
+    <input type="button" value="Nowa gra">
+    <span *ngIf="won">Wygrał: {{won}}</span>
+</div>
+
+<div>
+    <table>
+        <tr *ngFor="let row of positions; let x = index">
+            <td *ngFor="let cell of row; let y = index">
+                <tile [piece]="cell" [x]="x" [y]="y" (clicked)="handleTileClick($event)"></tile>
+            </td>
+        </tr>
+    </table>
+<div>
+
+<div>
+    <p>Captured ({{captured[BLACK].length}})</p>
+    <td *ngFor="let cell of captured[BLACK]; let i = index">
+        <tile [piece]="cell" [x]="-2" [y]="i" (clicked)="handleTileClick($event)"></tile>
+    </td>
+</div>
+
+<div>
+    <p>Captured ({{captured[WHITE].length}})</p>
+    <td *ngFor="let cell of captured[WHITE]; let i = index">
+        <tile [piece]="cell" [x]="-1" [y]="i" (clicked)="handleTileClick($event)"></tile>
+    </td>
+</div>

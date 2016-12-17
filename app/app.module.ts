@@ -1,11 +1,14 @@
 import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { AppComponent }  from './app.component';
+import { Game }  from './game';
+import { Board }  from './board';
+import { Tile }  from './tile';
+import { Piece }  from './piece';
 
 @NgModule({
   imports:      [ BrowserModule ],
-  declarations: [ AppComponent ],
-  bootstrap:    [ AppComponent ]
+  declarations: [ Game, Board, Tile ],
+  bootstrap:    [ Game ]
 })
 export class AppModule { }
