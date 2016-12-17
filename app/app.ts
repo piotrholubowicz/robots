@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Side } from './piece';
 import { Game } from './game';
 
 @Component({
@@ -7,5 +8,11 @@ import { Game } from './game';
   templateUrl: './app.ng.html',
 })
 export class App  {
-  game: Game = new Game();
+  starts = Side.WHITE;
+  game: Game = new Game(this.starts);
+
+  handleNewGame() {
+    this.starts = this.starts == Side.WHITE ? Side.BLACK : Side.WHITE;
+    this.game = new Game(this.starts);
+  }
 }

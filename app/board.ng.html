@@ -1,9 +1,11 @@
 <div>
-    <input type="button" value="Nowa gra">
-    <span *ngIf="game.won">Wygrał: {{game.won}}</span>
+    <input type="button" value="Nowa gra" (click)="newGameClicked()">
+    <span>Ruch: {{sideToName(game.whoseTurn)}}</span>
+    <span *ngIf="game.won != undefined">Wygrał: {{sideToName(game.won)}}</span>
 </div>
 
-<div>
+<div style="float: left">
+    <p style="text-align: center">Czarne</p>
     <table>
         <tr *ngFor="let row of game.positions; let x = index">
             <td *ngFor="let cell of row; let y = index">
@@ -11,18 +13,21 @@
             </td>
         </tr>
     </table>
-<div>
-
-<div>
-    <p>Captured ({{game.captured[BLACK].length}})</p>
-    <td *ngFor="let cell of game.captured[BLACK]; let i = index">
-        <tile [piece]="cell" [x]="-2" [y]="i" (clicked)="handleTileClick($event)"></tile>
-    </td>
+    <p style="text-align: center">Białe</p>
 </div>
 
-<div>
-    <p>Captured ({{game.captured[WHITE].length}})</p>
-    <td *ngFor="let cell of game.captured[WHITE]; let i = index">
-        <tile [piece]="cell" [x]="-1" [y]="i" (clicked)="handleTileClick($event)"></tile>
-    </td>
+<div style="float: left; margin-left: 50px;">
+    <div style="height: 150px; margin-bottom: 200px;">
+        <p>Złapane ({{game.captured[BLACK].length}})</p>
+        <td *ngFor="let cell of game.captured[BLACK]; let i = index">
+            <tile [piece]="cell" [x]="-2" [y]="i" (clicked)="handleTileClick($event)"></tile>
+        </td>
+    </div>
+
+    <div>
+        <p>Złapane ({{game.captured[WHITE].length}})</p>
+        <td *ngFor="let cell of game.captured[WHITE]; let i = index">
+            <tile [piece]="cell" [x]="-1" [y]="i" (clicked)="handleTileClick($event)"></tile>
+        </td>
+    </div>
 </div>

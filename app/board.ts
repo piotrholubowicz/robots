@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Piece, Side, Type } from './piece';
 import { Tile, TileClickedEvent } from './tile';
 import { Game } from './game';
@@ -14,6 +14,7 @@ export class Board  {
   get BLACK() { return Piece.side_to_string(Side.BLACK); }
 
   @Input() game: Game;
+  @Output() newGame = new EventEmitter<any>();
 
   handleTileClick(event: TileClickedEvent) {
     let tile = event.tile;
@@ -32,4 +33,14 @@ export class Board  {
       break;
     }
   }
+
+  newGameClicked() {
+    this.newGame.emit();
+  }
+
+  sideToName(side: Side): string {
+    // TODO customizable names
+    return side == Side.WHITE ? "Białe" : "Czarne";
+  }
+
 }
