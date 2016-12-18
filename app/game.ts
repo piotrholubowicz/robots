@@ -113,6 +113,11 @@ export class Game  {
           this.gameOver(Side.BLACK);
         }
       }
+      if (piece.type == Type.PAWN) {    
+        if (c.x == 0 || c.x == this.positions.length-1) {
+          this.positions[c.x][c.y] = new Piece(piece.side, Type.SUPERPAWN);
+        }
+      }
     }
 
     onPieceCaptured(capturedPiece: Piece) {
