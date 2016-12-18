@@ -37,6 +37,6 @@
         defaultExtension: 'js'
       }
     },
-    baseURL: '/'
+    baseURL: '/robots/
   });
 })(this);
