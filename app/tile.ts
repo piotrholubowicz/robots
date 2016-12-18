@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Piece, Side, Type } from './piece';
-import { Coords } from './common';
+import { Piece, Side, Type } from './model/piece';
+import { Coords } from './model/common';
 
 @Component({
   moduleId: module.id,

@@ -9,8 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var piece_1 = require('./piece');
-var game_1 = require('./game');
+var piece_1 = require('./model/piece');
+var game_1 = require('./model/game');
 var Board = (function () {
     function Board() {
         this.newGame = new core_1.EventEmitter();

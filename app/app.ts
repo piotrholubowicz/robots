@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { Side } from './piece';
-import { Game } from './game';
+import { Side } from './model/piece';
+import { Game } from './model/game';
 
 @Component({
   moduleId: module.id,

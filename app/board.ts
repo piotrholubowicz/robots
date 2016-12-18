@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Piece, Side, Type } from './piece';
+import { Piece, Side, Type } from './model/piece';
 import { Tile, TileClickedEvent } from './tile';
-import { Game } from './game';
+import { Game } from './model/game';
 
 @Component({
   moduleId: module.id,
