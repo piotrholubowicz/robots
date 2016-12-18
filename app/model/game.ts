@@ -9,8 +9,16 @@ export enum GameState {
 export class Game  { 
     get WHITE() { return Piece.side_to_string(Side.WHITE); }
     get BLACK() { return Piece.side_to_string(Side.BLACK); }
+    static get START_POSITIONS(): any[][] {
+      return [
+          [Piece.B_BISHOP, Piece.B_KING, Piece.B_ROOK],
+          [Piece.EMPTY, Piece.B_PAWN, Piece.EMPTY],
+          [Piece.EMPTY, Piece.W_PAWN, Piece.EMPTY],
+          [Piece.W_ROOK, Piece.W_KING, Piece.W_BISHOP],
+      ];
+  } 
 
-    positions: Piece[][] = Piece.START_POSITIONS;
+    pieces: Piece[][] = Game.START_POSITIONS;
     selected: Coords;
     captured: {[side: string]: Piece[]} = {};
     won: Side;
@@ -25,7 +33,7 @@ export class Game  {
 
     getPiece(c: Coords): Piece {
       if (c.x >= 0) {
-        return this.positions[c.x][c.y];
+        return this.pieces[c.x][c.y];
       } else if (c.x == -1) {
         return this.captured[this.WHITE][c.y];
       } else {
@@ -55,14 +63,14 @@ export class Game  {
     }
 
     updateAvailableOrAttacked(c: Coords) {
-      let piece = this.positions[c.x][c.y];
+      let piece = this.pieces[c.x][c.y];
       for (let pos of piece.movements()) {
         let x2 = c.x + pos[0];
         let y2 = c.y + pos[1];
         if (this.isOutOfBounds(x2, y2)) {
           continue;
         }
-        let otherPiece = this.positions[x2][y2];
+        let otherPiece = this.pieces[x2][y2];
         if (otherPiece.side == Side.NONE) {
           otherPiece.state = "available";
         } else if (otherPiece.side == piece.side) {
@@ -74,7 +82,7 @@ export class Game  {
     }
 
     isOutOfBounds(x: number, y: number): boolean {
-      return x < 0 || x >= this.positions.length || y < 0 || y >= this.positions[0].length;
+      return x < 0 || x >= this.pieces.length || y < 0 || y >= this.pieces[0].length;
     }
 
     movePiece(c: Coords) {
@@ -86,10 +94,10 @@ export class Game  {
     }
 
     movePieceOnBoard(c: Coords) {
-      let movedPiece = this.positions[this.selected.x][this.selected.y];
-      let emptyPiece = this.positions[c.x][c.y];
-      this.positions[c.x][c.y] = movedPiece;
-      this.positions[this.selected.x][this.selected.y] = emptyPiece;
+      let movedPiece = this.pieces[this.selected.x][this.selected.y];
+      let emptyPiece = this.pieces[c.x][c.y];
+      this.pieces[c.x][c.y] = movedPiece;
+      this.pieces[this.selected.x][this.selected.y] = emptyPiece;
       this.unselectAll();
       this.onPieceMoved(c, movedPiece, false);
     }
@@ -98,17 +106,17 @@ export class Game  {
       let side = this.selected.x == -1 ? Side.WHITE : Side.BLACK;
       console.log("side: " + side);
       let movedPiece = this.captured[Piece.side_to_string(side)][this.selected.y];
-      this.positions[c.x][c.y] = movedPiece;
+      this.pieces[c.x][c.y] = movedPiece;
       this.captured[Piece.side_to_string(side)].splice(this.selected.y, 1);
       this.unselectAll();
       this.onPieceMoved(c, movedPiece, true);
     }
 
     capturePiece(c: Coords) {
-      let movedPiece = this.positions[this.selected.x][this.selected.y];
-      let moveToPiece = this.positions[c.x][c.y];
-      this.positions[c.x][c.y] = movedPiece;
-      this.positions[this.selected.x][this.selected.y] = Piece.EMPTY;
+      let movedPiece = this.pieces[this.selected.x][this.selected.y];
+      let moveToPiece = this.pieces[c.x][c.y];
+      this.pieces[c.x][c.y] = movedPiece;
+      this.pieces[this.selected.x][this.selected.y] = Piece.EMPTY;
       this.captured[Piece.side_to_string(movedPiece.side)].push(moveToPiece.getOpposite());
       this.unselectAll();
       this.onPieceMoved(c, movedPiece, false);
@@ -120,13 +128,13 @@ export class Game  {
       if (piece.type == Type.KING) {    
         if (c.x == 0 && piece.side == Side.WHITE) {
           this.gameOver(Side.WHITE);
-        } else if (c.x == this.positions.length-1 && piece.side == Side.BLACK) {
+        } else if (c.x == this.pieces.length-1 && piece.side == Side.BLACK) {
           this.gameOver(Side.BLACK);
         }
       }
       if (piece.type == Type.PAWN) {    
-        if (c.x == 0 || c.x == this.positions.length-1) {
-          this.positions[c.x][c.y] = new Piece(piece.side, Type.SUPERPAWN);
+        if (c.x == 0 || c.x == this.pieces.length-1) {
+          this.pieces[c.x][c.y] = new Piece(piece.side, Type.SUPERPAWN);
         }
       }
     }
@@ -139,7 +147,7 @@ export class Game  {
 
     unselectAll() {
       this.selected = undefined;
-      for (let row of this.positions) {
+      for (let row of this.pieces) {
         for (let piece of row) {
           piece.state = "none";
         }
@@ -152,7 +160,7 @@ export class Game  {
     }
 
     updateAllEmptyToAvailable() {
-      for (let row of this.positions) {
+      for (let row of this.pieces) {
         for (let piece of row) {
           if (piece.type == Type.EMPTY) {
             piece.state = "available";

@@ -36,14 +36,6 @@ export class Piece {
   static get W_ROOK(): Piece { return new Piece(Side.WHITE, Type.ROOK); };
   static get W_PAWN(): Piece { return new Piece(Side.WHITE, Type.PAWN); };
   static get W_SUPERPAWN(): Piece { return new Piece(Side.WHITE, Type.SUPERPAWN); };
-  public static get START_POSITIONS(): any[][] {
-      return [
-          [Piece.B_BISHOP, Piece.B_KING, Piece.B_ROOK],
-          [Piece.EMPTY, Piece.B_PAWN, Piece.EMPTY],
-          [Piece.EMPTY, Piece.W_PAWN, Piece.EMPTY],
-          [Piece.W_ROOK, Piece.W_KING, Piece.W_BISHOP],
-      ];
-  } 
 
   side: Side;
   type: Type;

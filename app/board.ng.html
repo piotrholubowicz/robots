@@ -7,7 +7,7 @@
 <div style="float: left">
     <p style="text-align: center">Czarne</p>
     <table>
-        <tr *ngFor="let row of game.positions; let x = index">
+        <tr *ngFor="let row of game.pieces; let x = index">
             <td *ngFor="let cell of row; let y = index">
                 <tile [piece]="cell" [x]="x" [y]="y" (clicked)="handleTileClick($event)"></tile>
             </td>
