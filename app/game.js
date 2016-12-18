@@ -115,6 +115,11 @@ var Game = (function () {
                 this.gameOver(piece_1.Side.BLACK);
             }
         }
+        if (piece.type == piece_1.Type.PAWN) {
+            if (c.x == 0 || c.x == this.positions.length - 1) {
+                this.positions[c.x][c.y] = new piece_1.Piece(piece.side, piece_1.Type.SUPERPAWN);
+            }
+        }
     };
     Game.prototype.onPieceCaptured = function (capturedPiece) {
         if (capturedPiece.type == piece_1.Type.KING) {

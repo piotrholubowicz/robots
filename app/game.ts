@@ -15,7 +15,7 @@ export class Game  {
     captured: {[side: string]: Piece[]} = {};
     won: Side;
     state = GameState.ON;
-    whoseTurn;
+    whoseTurn: Side;
 
     constructor(starts: Side) {
       this.whoseTurn = starts;
