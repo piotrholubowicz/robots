@@ -7,5 +7,6 @@ app/**/*.js
 *.js.map
 e2e/**/*.js
 e2e/**/*.js.map
+systemjs.config.js
 _test-output
 _temp
