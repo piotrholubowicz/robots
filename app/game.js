@@ -80,20 +80,29 @@ var Game = (function () {
         return x < 0 || x >= this.positions.length || y < 0 || y >= this.positions[0].length;
     };
     Game.prototype.movePiece = function (c) {
-        var piece = this.positions[c.x][c.y];
-        var movedPiece = this.getPiece(this.selected);
         if (this.selected.x >= 0) {
-            var movedToPiece = piece;
-            this.positions[c.x][c.y] = this.positions[this.selected.x][this.selected.y];
-            this.positions[this.selected.x][this.selected.y] = movedToPiece;
+            this.movePieceOnBoard(c);
         }
         else {
-            var side = this.selected.x == -1 ? piece_1.Side.WHITE : piece_1.Side.BLACK;
-            this.positions[c.x][c.y] = movedPiece;
-            this.captured[piece_1.Piece.side_to_string(side)].splice(this.selected.y, 1);
+            this.putPieceOnBoard(c);
         }
+    };
+    Game.prototype.movePieceOnBoard = function (c) {
+        var movedPiece = this.positions[this.selected.x][this.selected.y];
+        var emptyPiece = this.positions[c.x][c.y];
+        this.positions[c.x][c.y] = movedPiece;
+        this.positions[this.selected.x][this.selected.y] = emptyPiece;
         this.unselectAll();
-        this.onPieceMoved(c, movedPiece);
+        this.onPieceMoved(c, movedPiece, false);
+    };
+    Game.prototype.putPieceOnBoard = function (c) {
+        var side = this.selected.x == -1 ? piece_1.Side.WHITE : piece_1.Side.BLACK;
+        console.log("side: " + side);
+        var movedPiece = this.captured[piece_1.Piece.side_to_string(side)][this.selected.y];
+        this.positions[c.x][c.y] = movedPiece;
+        this.captured[piece_1.Piece.side_to_string(side)].splice(this.selected.y, 1);
+        this.unselectAll();
+        this.onPieceMoved(c, movedPiece, true);
     };
     Game.prototype.capturePiece = function (c) {
         var movedPiece = this.positions[this.selected.x][this.selected.y];
@@ -102,10 +111,10 @@ var Game = (function () {
         this.positions[this.selected.x][this.selected.y] = piece_1.Piece.EMPTY;
         this.captured[piece_1.Piece.side_to_string(movedPiece.side)].push(moveToPiece.getOpposite());
         this.unselectAll();
-        this.onPieceMoved(c, movedPiece);
+        this.onPieceMoved(c, movedPiece, false);
         this.onPieceCaptured(moveToPiece);
     };
-    Game.prototype.onPieceMoved = function (c, piece) {
+    Game.prototype.onPieceMoved = function (c, piece, wasCaptured) {
         this.whoseTurn = this.opposite(this.whoseTurn);
         if (piece.type == piece_1.Type.KING) {
             if (c.x == 0 && piece.side == piece_1.Side.WHITE) {

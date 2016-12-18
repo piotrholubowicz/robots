@@ -78,19 +78,30 @@ export class Game  {
     }
 
     movePiece(c: Coords) {
-      let piece = this.positions[c.x][c.y];
-      let movedPiece = this.getPiece(this.selected);
       if (this.selected.x >= 0) {
-        let movedToPiece = piece;
-        this.positions[c.x][c.y] = this.positions[this.selected.x][this.selected.y];
-        this.positions[this.selected.x][this.selected.y] = movedToPiece;
+        this.movePieceOnBoard(c);
       } else {
-        let side = this.selected.x == -1 ? Side.WHITE : Side.BLACK;
-        this.positions[c.x][c.y] = movedPiece;
-        this.captured[Piece.side_to_string(side)].splice(this.selected.y, 1);
+        this.putPieceOnBoard(c);
       }
+    }
+
+    movePieceOnBoard(c: Coords) {
+      let movedPiece = this.positions[this.selected.x][this.selected.y];
+      let emptyPiece = this.positions[c.x][c.y];
+      this.positions[c.x][c.y] = movedPiece;
+      this.positions[this.selected.x][this.selected.y] = emptyPiece;
       this.unselectAll();
-      this.onPieceMoved(c, movedPiece);
+      this.onPieceMoved(c, movedPiece, false);
+    }
+
+    putPieceOnBoard(c: Coords) {
+      let side = this.selected.x == -1 ? Side.WHITE : Side.BLACK;
+      console.log("side: " + side);
+      let movedPiece = this.captured[Piece.side_to_string(side)][this.selected.y];
+      this.positions[c.x][c.y] = movedPiece;
+      this.captured[Piece.side_to_string(side)].splice(this.selected.y, 1);
+      this.unselectAll();
+      this.onPieceMoved(c, movedPiece, true);
     }
 
     capturePiece(c: Coords) {
@@ -100,11 +111,11 @@ export class Game  {
       this.positions[this.selected.x][this.selected.y] = Piece.EMPTY;
       this.captured[Piece.side_to_string(movedPiece.side)].push(moveToPiece.getOpposite());
       this.unselectAll();
-      this.onPieceMoved(c, movedPiece);
+      this.onPieceMoved(c, movedPiece, false);
       this.onPieceCaptured(moveToPiece);
     }
 
-    onPieceMoved(c: Coords, piece: Piece) {
+    onPieceMoved(c: Coords, piece: Piece, wasCaptured: boolean) {
       this.whoseTurn = this.opposite(this.whoseTurn);
       if (piece.type == Type.KING) {    
         if (c.x == 0 && piece.side == Side.WHITE) {
