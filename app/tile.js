@@ -9,8 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var piece_1 = require('./piece');
-var common_1 = require('./common');
+var piece_1 = require('./model/piece');
+var common_1 = require('./model/common');
 var Tile = (function () {
     function Tile() {
         this.clicked = new core_1.EventEmitter();

@@ -1,13 +1,13 @@
 <div>
     <input type="button" value="Nowa gra" (click)="newGameClicked()">
     <span>Ruch: {{sideToName(game.whoseTurn)}}</span>
-    <span *ngIf="game.won != undefined">Wygrał: {{sideToName(game.won)}}</span>
+    <span *ngIf="game.won != undefined">Wygrały: {{sideToName(game.won)}}</span>
 </div>
 
 <div style="float: left">
     <p style="text-align: center">Czarne</p>
     <table>
-        <tr *ngFor="let row of game.positions; let x = index">
+        <tr *ngFor="let row of game.pieces; let x = index">
             <td *ngFor="let cell of row; let y = index">
                 <tile [piece]="cell" [x]="x" [y]="y" (clicked)="handleTileClick($event)"></tile>
             </td>

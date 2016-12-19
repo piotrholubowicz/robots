@@ -1,14 +1,15 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Piece, Side, Type } from './piece';
+import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
+import { Piece, Side, Type } from './model/piece';
 import { Tile, TileClickedEvent } from './tile';
-import { Game } from './game';
+import { Game, GameState } from './model/game';
+import { AI } from './model/ai';
 
 @Component({
   moduleId: module.id,
   selector: 'board',
   templateUrl: './board.ng.html',
 })
-export class Board  {
+export class Board implements OnChanges {
   // Templates can't access static value, so we redirect as follows.
   get WHITE() { return Piece.side_to_string(Side.WHITE); }
   get BLACK() { return Piece.side_to_string(Side.BLACK); }
@@ -16,21 +17,31 @@ export class Board  {
   @Input() game: Game;
   @Output() newGame = new EventEmitter<any>();
 
+  ai: AI;
+  aiSide = Side.BLACK;
+
+  constructor() {
+    this.ai = new AI(1);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // check if it's AI move on every new game
+    if (changes['game'] != undefined) {
+      this.checkAI();
+    }
+  }
+
   handleTileClick(event: TileClickedEvent) {
-    let tile = event.tile;
-    switch(tile.piece.state) {
-      case "none":
-      this.game.selectPiece(tile.coords());
-      break;
-      case "selected":
-      this.game.unselectAll();
-      break;
-      case "available":
-      this.game.movePiece(tile.coords());
-      break;
-      case "attacked":
-      this.game.capturePiece(tile.coords());
-      break;
+    this.game.clicked(event.tile.coords());
+    this.checkAI();
+  }
+
+  private checkAI() {
+    if (this.game.whoseTurn == this.aiSide && this.game.state != GameState.OVER) {
+      console.log("AI is thinking");
+      let move = this.ai.nextMove(this.game);
+      console.log("AI will move from ["+move.src.x+","+move.src.y+"] to ["+move.dst.x+","+move.dst.y+"]");
+      this.game.makeMove(move, 800);
     }
   }
 
