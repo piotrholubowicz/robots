@@ -1,7 +1,7 @@
 <div>
     <input type="button" value="Nowa gra" (click)="newGameClicked()">
     <span>Ruch: {{sideToName(game.whoseTurn)}}</span>
-    <span *ngIf="game.won != undefined">Wygrał: {{sideToName(game.won)}}</span>
+    <span *ngIf="game.won != undefined">Wygrały: {{sideToName(game.won)}}</span>
 </div>
 
 <div style="float: left">

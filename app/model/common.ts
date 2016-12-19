@@ -19,4 +19,8 @@ export class Utils {
         }
         return a;
     }
+
+    static delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 }

@@ -29,14 +29,22 @@ var Board = (function () {
         enumerable: true,
         configurable: true
     });
+    Board.prototype.ngOnChanges = function (changes) {
+        // check if it's AI move on every new game
+        if (changes['game'] != undefined) {
+            this.checkAI();
+        }
+    };
     Board.prototype.handleTileClick = function (event) {
         this.game.clicked(event.tile.coords());
-        // TODO put some timer for animation
-        if (this.game.whoseTurn == this.aiSide) {
+        this.checkAI();
+    };
+    Board.prototype.checkAI = function () {
+        if (this.game.whoseTurn == this.aiSide && this.game.state != game_1.GameState.OVER) {
             console.log("AI is thinking");
             var move = this.ai.nextMove(this.game);
             console.log("AI will move from [" + move.src.x + "," + move.src.y + "] to [" + move.dst.x + "," + move.dst.y + "]");
-            this.game.makeMove(move);
+            this.game.makeMove(move, 800);
         }
     };
     Board.prototype.newGameClicked = function () {

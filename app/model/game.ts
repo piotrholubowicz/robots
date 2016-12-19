@@ -1,6 +1,6 @@
 import { Piece, Side, Type } from './piece';
 import { Move } from './move';
-import { Coords } from './common';
+import { Coords, Utils } from './common';
 
 export enum GameState {
   ON,
@@ -32,9 +32,9 @@ export class Game  {
       this.captured[this.BLACK] = [];
     }
 
-    makeMove(move: Move) {
+    makeMove(move: Move, intervalMs = 0) {
       this.selectPiece(move.src);
-      this.clicked(move.dst);
+      setTimeout(()=>{this.clicked(move.dst)}, intervalMs);
     }
 
     clicked(c: Coords) {
