@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Piece, Side, Type } from './model/piece';
 import { Tile, TileClickedEvent } from './tile';
 import { Game } from './model/game';
+import { AI } from './model/ai';
 
 @Component({
   moduleId: module.id,
@@ -16,21 +17,22 @@ export class Board  {
   @Input() game: Game;
   @Output() newGame = new EventEmitter<any>();
 
+  ai: AI;
+  aiSide = Side.BLACK;
+
+  constructor() {
+    this.ai = new AI(1);
+  }
+
   handleTileClick(event: TileClickedEvent) {
-    let tile = event.tile;
-    switch(tile.piece.state) {
-      case "none":
-      this.game.selectPiece(tile.coords());
-      break;
-      case "selected":
-      this.game.unselectAll();
-      break;
-      case "available":
-      this.game.movePiece(tile.coords());
-      break;
-      case "attacked":
-      this.game.capturePiece(tile.coords());
-      break;
+    this.game.clicked(event.tile.coords());
+
+    // TODO put some timer for animation
+    if (this.game.whoseTurn == this.aiSide) {
+      console.log("AI is thinking");
+      let move = this.ai.nextMove(this.game);
+      console.log("AI will move from ["+move.src.x+","+move.src.y+"] to ["+move.dst.x+","+move.dst.y+"]");
+      this.game.makeMove(move);
     }
   }
 

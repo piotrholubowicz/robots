@@ -1,5 +1,6 @@
 import { Game } from './game';
 import { Piece, Side, Type } from './piece';
+import { Move } from './move';
 import { Coords, Utils } from './common';
 
 export class AI {
@@ -13,7 +14,7 @@ export class AI {
         for (let move of moves) {
             this.evaluate(move, game);
         }
-        Utils.shuffleInPlace(moves);
+        Utils.shuffle(moves);
         moves.sort((m1, m2) => m2.value-m1.value);
         return moves[0];
     }
@@ -23,6 +24,9 @@ export class AI {
         for (let i=0; i<game.pieces.length; i++) {
             for (let j=0; j<game.pieces[i].length; j++) {
                 let piece = game.pieces[i][j];
+                if (piece.side != game.whoseTurn) {
+                    continue;
+                }
                 for (let pos of piece.movements()) {
                     let x2 = i + pos[0];
                     let y2 = j + pos[1];
@@ -48,16 +52,5 @@ export class AI {
     evaluate(move: Move, game: Game) {
         // TODO do something better
         move.value = 0.5;
-    }
-}
-
-export class Move {
-    src: Coords;
-    dst: Coords;
-    value: number;
-
-    constructor(src: Coords, dst: Coords) {
-        this.src = src;
-        this.dst = dst;
     }
 }

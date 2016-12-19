@@ -1,4 +1,5 @@
 import { Piece, Side, Type } from './piece';
+import { Move } from './move';
 import { Coords } from './common';
 
 export enum GameState {
@@ -31,7 +32,30 @@ export class Game  {
       this.captured[this.BLACK] = [];
     }
 
-    getPiece(c: Coords): Piece {
+    makeMove(move: Move) {
+      this.selectPiece(move.src);
+      this.clicked(move.dst);
+    }
+
+    clicked(c: Coords) {
+      let piece = this.getPiece(c);
+      switch(piece.state) {
+        case "none":
+        this.selectPiece(c);
+        break;
+        case "selected":
+        this.unselectAll();
+        break;
+        case "available":
+        this.movePiece(c);
+        break;
+        case "attacked":
+        this.capturePiece(c);
+        break;
+      }
+    }
+
+    private getPiece(c: Coords): Piece {
       if (c.x >= 0) {
         return this.pieces[c.x][c.y];
       } else if (c.x == -1) {
@@ -41,7 +65,7 @@ export class Game  {
       }
     }
 
-    selectPiece(c: Coords) {
+    private selectPiece(c: Coords) {
       if (this.state == GameState.OVER) {
         return;
       }
@@ -62,7 +86,7 @@ export class Game  {
       }
     }
 
-    updateAvailableOrAttacked(c: Coords) {
+    private updateAvailableOrAttacked(c: Coords) {
       let piece = this.pieces[c.x][c.y];
       for (let pos of piece.movements()) {
         let x2 = c.x + pos[0];
@@ -85,7 +109,7 @@ export class Game  {
       return x < 0 || x >= this.pieces.length || y < 0 || y >= this.pieces[0].length;
     }
 
-    movePiece(c: Coords) {
+    private movePiece(c: Coords) {
       if (this.selected.x >= 0) {
         this.movePieceOnBoard(c);
       } else {
@@ -93,7 +117,7 @@ export class Game  {
       }
     }
 
-    movePieceOnBoard(c: Coords) {
+    private movePieceOnBoard(c: Coords) {
       let movedPiece = this.pieces[this.selected.x][this.selected.y];
       let emptyPiece = this.pieces[c.x][c.y];
       this.pieces[c.x][c.y] = movedPiece;
@@ -102,7 +126,7 @@ export class Game  {
       this.onPieceMoved(c, movedPiece, false);
     }
 
-    putPieceOnBoard(c: Coords) {
+    private putPieceOnBoard(c: Coords) {
       let side = this.selected.x == -1 ? Side.WHITE : Side.BLACK;
       console.log("side: " + side);
       let movedPiece = this.captured[Piece.side_to_string(side)][this.selected.y];
@@ -112,7 +136,7 @@ export class Game  {
       this.onPieceMoved(c, movedPiece, true);
     }
 
-    capturePiece(c: Coords) {
+    private capturePiece(c: Coords) {
       let movedPiece = this.pieces[this.selected.x][this.selected.y];
       let moveToPiece = this.pieces[c.x][c.y];
       this.pieces[c.x][c.y] = movedPiece;
@@ -123,7 +147,7 @@ export class Game  {
       this.onPieceCaptured(moveToPiece);
     }
 
-    onPieceMoved(c: Coords, piece: Piece, wasCaptured: boolean) {
+    private onPieceMoved(c: Coords, piece: Piece, wasCaptured: boolean) {
       this.whoseTurn = this.opposite(this.whoseTurn);
       if (piece.type == Type.KING) {    
         if (c.x == 0 && piece.side == Side.WHITE) {
@@ -139,13 +163,13 @@ export class Game  {
       }
     }
 
-    onPieceCaptured(capturedPiece: Piece) {
+    private onPieceCaptured(capturedPiece: Piece) {
       if (capturedPiece.type == Type.KING) {
         this.gameOver(this.opposite(capturedPiece.side));
       }
     }
 
-    unselectAll() {
+    private unselectAll() {
       this.selected = undefined;
       for (let row of this.pieces) {
         for (let piece of row) {
@@ -159,7 +183,7 @@ export class Game  {
       }
     }
 
-    updateAllEmptyToAvailable() {
+    private updateAllEmptyToAvailable() {
       for (let row of this.pieces) {
         for (let piece of row) {
           if (piece.type == Type.EMPTY) {
@@ -169,13 +193,13 @@ export class Game  {
       }
     }
 
-    gameOver(winning: Side) {
+    private gameOver(winning: Side) {
       console.log("game over")
       this.won = winning;
       this.state = GameState.OVER;
     }
 
-    opposite(side: Side): Side {
+    private opposite(side: Side): Side {
       return side == Side.BLACK ? Side.WHITE : Side.BLACK;
     }
 }

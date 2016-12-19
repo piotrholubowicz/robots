@@ -11,9 +11,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var piece_1 = require('./model/piece');
 var game_1 = require('./model/game');
+var ai_1 = require('./model/ai');
 var Board = (function () {
     function Board() {
         this.newGame = new core_1.EventEmitter();
+        this.aiSide = piece_1.Side.BLACK;
+        this.ai = new ai_1.AI(1);
     }
     Object.defineProperty(Board.prototype, "WHITE", {
         // Templates can't access static value, so we redirect as follows.
@@ -27,20 +30,13 @@ var Board = (function () {
         configurable: true
     });
     Board.prototype.handleTileClick = function (event) {
-        var tile = event.tile;
-        switch (tile.piece.state) {
-            case "none":
-                this.game.selectPiece(tile.coords());
-                break;
-            case "selected":
-                this.game.unselectAll();
-                break;
-            case "available":
-                this.game.movePiece(tile.coords());
-                break;
-            case "attacked":
-                this.game.capturePiece(tile.coords());
-                break;
+        this.game.clicked(event.tile.coords());
+        // TODO put some timer for animation
+        if (this.game.whoseTurn == this.aiSide) {
+            console.log("AI is thinking");
+            var move = this.ai.nextMove(this.game);
+            console.log("AI will move from [" + move.src.x + "," + move.src.y + "] to [" + move.dst.x + "," + move.dst.y + "]");
+            this.game.makeMove(move);
         }
     };
     Board.prototype.newGameClicked = function () {
