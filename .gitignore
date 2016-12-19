@@ -3,8 +3,6 @@ jspm_packages
 node_modules
 npm-debug.*
 link-checker-results.txt
-app/**/*.js
-*.js.map
 e2e/**/*.js
 e2e/**/*.js.map
 systemjs.config.js
