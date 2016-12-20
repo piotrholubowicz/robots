@@ -10,10 +10,9 @@ export class Coords {
 
 export class Utils {
     static shuffle<T>(a: T[]): T[] {
-        let j, x, i: number;
-        for (i = a.length; i; i--) {
-            j = Math.floor(Math.random() * i);
-            x = a[i - 1];
+        for (let i = a.length; i; i--) {
+            let j = Math.floor(Math.random() * i);
+            let x = a[i - 1];
             a[i - 1] = a[j];
             a[j] = x;
         }

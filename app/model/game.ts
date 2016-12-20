@@ -20,6 +20,7 @@ export class Game  {
   } 
 
     pieces: Piece[][] = Game.START_POSITIONS;
+    pieceCount: {[side: string]: number} = {};
     selected: Coords;
     captured: {[side: string]: Piece[]} = {};
     won: Side;
@@ -30,11 +31,38 @@ export class Game  {
       this.whoseTurn = starts;
       this.captured[this.WHITE] = [];
       this.captured[this.BLACK] = [];
+      this.pieceCount[this.WHITE] = 4;
+      this.pieceCount[this.BLACK] = 4;
     }
 
-    makeMove(move: Move, intervalMs = 0) {
+    clone(): Game {
+      let that = new Game(this.whoseTurn);
+      for (let i=0; i<this.pieces.length; i++) {
+        for (let j=0; j<this.pieces[0].length; j++) {
+          that.pieces[i][j] = this.pieces[i][j].clone();
+        }
+      }
+      that.pieceCount[this.WHITE] = this.pieceCount[this.WHITE];
+      that.pieceCount[this.BLACK] = this.pieceCount[this.BLACK];
+      that.selected = this.selected;
+      for (let c of this.captured[this.WHITE]) {
+        that.captured[this.WHITE].push(c.clone());
+      }
+      for (let c of this.captured[this.BLACK]) {
+        that.captured[this.BLACK].push(c.clone());
+      }
+      that.won = this.won;
+      that.state = this.state;
+      return that;
+    }
+
+    makeMove(move: Move, intervalMs?: number) {
       this.selectPiece(move.src);
-      setTimeout(()=>{this.clicked(move.dst)}, intervalMs);
+      if (intervalMs == undefined) {
+        this.clicked(move.dst);
+      } else {
+        setTimeout(()=>{this.clicked(move.dst)}, intervalMs);
+      }
     }
 
     clicked(c: Coords) {
@@ -105,7 +133,7 @@ export class Game  {
       }
     }
 
-    isOutOfBounds(x: number, y: number): boolean {
+    public isOutOfBounds(x: number, y: number): boolean {
       return x < 0 || x >= this.pieces.length || y < 0 || y >= this.pieces[0].length;
     }
 
@@ -156,7 +184,7 @@ export class Game  {
           this.gameOver(Side.BLACK);
         }
       }
-      if (piece.type == Type.PAWN) {    
+      if (piece.type == Type.PAWN && !wasCaptured) {
         if (c.x == 0 || c.x == this.pieces.length-1) {
           this.pieces[c.x][c.y] = new Piece(piece.side, Type.SUPERPAWN);
         }
@@ -167,6 +195,8 @@ export class Game  {
       if (capturedPiece.type == Type.KING) {
         this.gameOver(this.opposite(capturedPiece.side));
       }
+      this.pieceCount[Piece.side_to_string(capturedPiece.side)]--;
+      this.pieceCount[Piece.side_to_string(this.opposite(capturedPiece.side))]++;
     }
 
     private unselectAll() {

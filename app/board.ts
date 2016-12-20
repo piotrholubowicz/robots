@@ -21,7 +21,7 @@ export class Board implements OnChanges {
   aiSide = Side.BLACK;
 
   constructor() {
-    this.ai = new AI(1);
+    this.ai = new AI(2);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -38,9 +38,8 @@ export class Board implements OnChanges {
 
   private checkAI() {
     if (this.game.whoseTurn == this.aiSide && this.game.state != GameState.OVER) {
-      console.log("AI is thinking");
       let move = this.ai.nextMove(this.game);
-      console.log("AI will move from ["+move.src.x+","+move.src.y+"] to ["+move.dst.x+","+move.dst.y+"]");
+      console.log("AI will move " + move.toString());
       this.game.makeMove(move, 800);
     }
   }
