@@ -85,8 +85,7 @@ export class AI {
         }
         Utils.shuffle(moves);
         moves.sort((m1, m2) => m2.value-m1.value);
-        // TODO make it less deterministic
-        return moves[0];
+        return this.almostFirst(moves, 0.9, 3);
     }
 
     /**
@@ -94,7 +93,7 @@ export class AI {
      * wins, 0 means they lose, 0.5 is even.
      */
     evaluatePosition(game: Game, side: Side): number {
-        // make it simple. Victory = 1, defeat = 0, else 0.5
+        // victory = 1, defeat = 0, else ratio of pawn count
         if (game.state == GameState.OVER) {
             if (game.won == side) {
                 return 1.0;
@@ -102,6 +101,15 @@ export class AI {
                 return 0;
             }
         }
-        return 0.5;
+        return game.pieceCount[Piece.side_to_string(side)] / 8;
+    }
+
+    private almostFirst(moves: Move[], ratio: number, tries: number): Move {
+        for (let i=0; i<tries; i++) {
+            if (Math.random() < ratio || moves.length == i+1) {
+                return moves[i];
+            }
+        }
+        return moves[tries-1];
     }
 }

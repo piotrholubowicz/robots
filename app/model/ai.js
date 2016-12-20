@@ -86,15 +86,14 @@ var AI = (function () {
         }
         common_1.Utils.shuffle(moves);
         moves.sort(function (m1, m2) { return m2.value - m1.value; });
-        // TODO make it less deterministic
-        return moves[0];
+        return this.almostFirst(moves, 0.9, 3);
     };
     /**
      * Evaluates the position for the specified player. 1 means the player
      * wins, 0 means they lose, 0.5 is even.
      */
     AI.prototype.evaluatePosition = function (game, side) {
-        // make it simple. Victory = 1, defeat = 0, else 0.5
+        // victory = 1, defeat = 0, else ratio of pawn count
         if (game.state == game_1.GameState.OVER) {
             if (game.won == side) {
                 return 1.0;
@@ -103,7 +102,15 @@ var AI = (function () {
                 return 0;
             }
         }
-        return 0.5;
+        return game.pieceCount[piece_1.Piece.side_to_string(side)] / 8;
+    };
+    AI.prototype.almostFirst = function (moves, ratio, tries) {
+        for (var i = 0; i < tries; i++) {
+            if (Math.random() < ratio || moves.length == i + 1) {
+                return moves[i];
+            }
+        }
+        return moves[tries - 1];
     };
     return AI;
 }());

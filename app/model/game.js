@@ -8,11 +8,14 @@ var GameState = exports.GameState;
 var Game = (function () {
     function Game(starts) {
         this.pieces = Game.START_POSITIONS;
+        this.pieceCount = {};
         this.captured = {};
         this.state = GameState.ON;
         this.whoseTurn = starts;
         this.captured[this.WHITE] = [];
         this.captured[this.BLACK] = [];
+        this.pieceCount[this.WHITE] = 4;
+        this.pieceCount[this.BLACK] = 4;
     }
     Object.defineProperty(Game.prototype, "WHITE", {
         get: function () { return piece_1.Piece.side_to_string(piece_1.Side.WHITE); },
@@ -43,6 +46,8 @@ var Game = (function () {
                 that.pieces[i][j] = this.pieces[i][j].clone();
             }
         }
+        that.pieceCount[this.WHITE] = this.pieceCount[this.WHITE];
+        that.pieceCount[this.BLACK] = this.pieceCount[this.BLACK];
         that.selected = this.selected;
         for (var _i = 0, _a = this.captured[this.WHITE]; _i < _a.length; _i++) {
             var c = _a[_i];
@@ -193,6 +198,8 @@ var Game = (function () {
         if (capturedPiece.type == piece_1.Type.KING) {
             this.gameOver(this.opposite(capturedPiece.side));
         }
+        this.pieceCount[piece_1.Piece.side_to_string(capturedPiece.side)]--;
+        this.pieceCount[piece_1.Piece.side_to_string(this.opposite(capturedPiece.side))]++;
     };
     Game.prototype.unselectAll = function () {
         this.selected = undefined;

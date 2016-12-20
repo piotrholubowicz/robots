@@ -20,6 +20,7 @@ export class Game  {
   } 
 
     pieces: Piece[][] = Game.START_POSITIONS;
+    pieceCount: {[side: string]: number} = {};
     selected: Coords;
     captured: {[side: string]: Piece[]} = {};
     won: Side;
@@ -30,6 +31,8 @@ export class Game  {
       this.whoseTurn = starts;
       this.captured[this.WHITE] = [];
       this.captured[this.BLACK] = [];
+      this.pieceCount[this.WHITE] = 4;
+      this.pieceCount[this.BLACK] = 4;
     }
 
     clone(): Game {
@@ -39,6 +42,8 @@ export class Game  {
           that.pieces[i][j] = this.pieces[i][j].clone();
         }
       }
+      that.pieceCount[this.WHITE] = this.pieceCount[this.WHITE];
+      that.pieceCount[this.BLACK] = this.pieceCount[this.BLACK];
       that.selected = this.selected;
       for (let c of this.captured[this.WHITE]) {
         that.captured[this.WHITE].push(c.clone());
@@ -190,6 +195,8 @@ export class Game  {
       if (capturedPiece.type == Type.KING) {
         this.gameOver(this.opposite(capturedPiece.side));
       }
+      this.pieceCount[Piece.side_to_string(capturedPiece.side)]--;
+      this.pieceCount[Piece.side_to_string(this.opposite(capturedPiece.side))]++;
     }
 
     private unselectAll() {
