@@ -16,7 +16,7 @@ var Board = (function () {
     function Board() {
         this.newGame = new core_1.EventEmitter();
         this.aiSide = piece_1.Side.BLACK;
-        this.ai = new ai_1.AI(1);
+        this.ai = new ai_1.AI(2);
     }
     Object.defineProperty(Board.prototype, "WHITE", {
         // Templates can't access static value, so we redirect as follows.
@@ -41,9 +41,8 @@ var Board = (function () {
     };
     Board.prototype.checkAI = function () {
         if (this.game.whoseTurn == this.aiSide && this.game.state != game_1.GameState.OVER) {
-            console.log("AI is thinking");
             var move = this.ai.nextMove(this.game);
-            console.log("AI will move from [" + move.src.x + "," + move.src.y + "] to [" + move.dst.x + "," + move.dst.y + "]");
+            console.log("AI will move " + move.toString());
             this.game.makeMove(move, 800);
         }
     };

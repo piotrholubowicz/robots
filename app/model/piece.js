@@ -94,6 +94,11 @@ var Piece = (function () {
         configurable: true
     });
     ;
+    Piece.prototype.clone = function () {
+        var that = new Piece(this.side, this.type);
+        that.state = this.state;
+        return that;
+    };
     Piece.prototype.text = function () {
         return this.side + " " + this.type;
     };

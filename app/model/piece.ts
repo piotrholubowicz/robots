@@ -46,6 +46,12 @@ export class Piece {
     this.type = type;
   }
 
+  public clone(): Piece {
+      let that = new Piece(this.side, this.type);
+      that.state = this.state;
+      return that;
+  }
+
   text() {
       return this.side + " " + this.type;
   }

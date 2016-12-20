@@ -9,4 +9,8 @@ export class Move {
         this.src = src;
         this.dst = dst;
     }
+
+    toString(): string {
+        return "["+this.src.x+","+this.src.y+"] => ["+this.dst.x+","+this.dst.y+"]";
+    }
 }

@@ -36,11 +36,35 @@ var Game = (function () {
         enumerable: true,
         configurable: true
     });
+    Game.prototype.clone = function () {
+        var that = new Game(this.whoseTurn);
+        for (var i = 0; i < this.pieces.length; i++) {
+            for (var j = 0; j < this.pieces[0].length; j++) {
+                that.pieces[i][j] = this.pieces[i][j].clone();
+            }
+        }
+        that.selected = this.selected;
+        for (var _i = 0, _a = this.captured[this.WHITE]; _i < _a.length; _i++) {
+            var c = _a[_i];
+            that.captured[this.WHITE].push(c.clone());
+        }
+        for (var _b = 0, _c = this.captured[this.BLACK]; _b < _c.length; _b++) {
+            var c = _c[_b];
+            that.captured[this.BLACK].push(c.clone());
+        }
+        that.won = this.won;
+        that.state = this.state;
+        return that;
+    };
     Game.prototype.makeMove = function (move, intervalMs) {
         var _this = this;
-        if (intervalMs === void 0) { intervalMs = 0; }
         this.selectPiece(move.src);
-        setTimeout(function () { _this.clicked(move.dst); }, intervalMs);
+        if (intervalMs == undefined) {
+            this.clicked(move.dst);
+        }
+        else {
+            setTimeout(function () { _this.clicked(move.dst); }, intervalMs);
+        }
     };
     Game.prototype.clicked = function (c) {
         var piece = this.getPiece(c);
@@ -159,7 +183,7 @@ var Game = (function () {
                 this.gameOver(piece_1.Side.BLACK);
             }
         }
-        if (piece.type == piece_1.Type.PAWN) {
+        if (piece.type == piece_1.Type.PAWN && !wasCaptured) {
             if (c.x == 0 || c.x == this.pieces.length - 1) {
                 this.pieces[c.x][c.y] = new piece_1.Piece(piece.side, piece_1.Type.SUPERPAWN);
             }

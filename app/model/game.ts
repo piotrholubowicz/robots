@@ -32,9 +32,32 @@ export class Game  {
       this.captured[this.BLACK] = [];
     }
 
-    makeMove(move: Move, intervalMs = 0) {
+    clone(): Game {
+      let that = new Game(this.whoseTurn);
+      for (let i=0; i<this.pieces.length; i++) {
+        for (let j=0; j<this.pieces[0].length; j++) {
+          that.pieces[i][j] = this.pieces[i][j].clone();
+        }
+      }
+      that.selected = this.selected;
+      for (let c of this.captured[this.WHITE]) {
+        that.captured[this.WHITE].push(c.clone());
+      }
+      for (let c of this.captured[this.BLACK]) {
+        that.captured[this.BLACK].push(c.clone());
+      }
+      that.won = this.won;
+      that.state = this.state;
+      return that;
+    }
+
+    makeMove(move: Move, intervalMs?: number) {
       this.selectPiece(move.src);
-      setTimeout(()=>{this.clicked(move.dst)}, intervalMs);
+      if (intervalMs == undefined) {
+        this.clicked(move.dst);
+      } else {
+        setTimeout(()=>{this.clicked(move.dst)}, intervalMs);
+      }
     }
 
     clicked(c: Coords) {
@@ -105,7 +128,7 @@ export class Game  {
       }
     }
 
-    isOutOfBounds(x: number, y: number): boolean {
+    public isOutOfBounds(x: number, y: number): boolean {
       return x < 0 || x >= this.pieces.length || y < 0 || y >= this.pieces[0].length;
     }
 
@@ -156,7 +179,7 @@ export class Game  {
           this.gameOver(Side.BLACK);
         }
       }
-      if (piece.type == Type.PAWN) {    
+      if (piece.type == Type.PAWN && !wasCaptured) {
         if (c.x == 0 || c.x == this.pieces.length-1) {
           this.pieces[c.x][c.y] = new Piece(piece.side, Type.SUPERPAWN);
         }

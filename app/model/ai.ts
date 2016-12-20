@@ -1,4 +1,4 @@
-import { Game } from './game';
+import { Game, GameState } from './game';
 import { Piece, Side, Type } from './piece';
 import { Move } from './move';
 import { Coords, Utils } from './common';
@@ -10,13 +10,13 @@ export class AI {
     }
 
     nextMove(game: Game): Move {
-        let moves = this.getAllMoves(game);
-        for (let move of moves) {
-            this.evaluate(move, game);
+        console.log("AI is thinking");
+        if (this.depth == 0) { // random 
+            let moves = this.getAllMoves(game);
+            Utils.shuffle(moves);
+            return moves[0];
         }
-        Utils.shuffle(moves);
-        moves.sort((m1, m2) => m2.value-m1.value);
-        return moves[0];
+        return this.evaluatePossibleMoves(game, this.depth);
     }
 
     getAllMoves(game: Game): Move[] {
@@ -46,11 +46,62 @@ export class AI {
                 }
             }
         }
+        for (let i=0; i<game.pieces.length; i++) {
+            for (let j=0; j<game.pieces[i].length; j++) {
+                if (game.pieces[i][j].type == Type.EMPTY) {
+                    for (let k=0; k<game.captured[Piece.side_to_string(game.whoseTurn)].length; k++) {
+                        let q = game.whoseTurn == Side.WHITE ? -1 : -2;     
+                        moves.push(new Move(new Coords(q,k), new Coords(i,j)));
+                    }
+                }
+            }
+        }
         return moves;
     }
 
-    evaluate(move: Move, game: Game) {
-        // TODO do something better
-        move.value = 0.5;
+    /**
+     * Evaluates all possible moves from this position. If depth is 1, then it
+     * evaluates the position after 1 move. If depth is 2, then it for each
+     * move it checks its followup moves and assumes the one yielding lowest
+     * score will be played. And so on.
+     */
+    evaluatePossibleMoves(originalGame: Game, depth: number, intend = ""): Move {
+        let moves = this.getAllMoves(originalGame);
+        for (let move of moves) {
+            console.log(intend + "Considering " + move.toString() + " (" + depth + ")");
+            let game = originalGame.clone();
+            game.makeMove(move);
+            if (depth == 1) {
+                // don't look deeper, just evaluate the board
+                move.value = this.evaluatePosition(game, originalGame.whoseTurn);
+                console.log(intend + "Evaluating the position: " + move.value);
+            } else {
+                // pick the best move for the opponent from here
+                let opponentsMove = this.evaluatePossibleMoves(game, depth-1, intend + " ");
+                // if the best move gives them 0.7, then it's 0.3 for us
+                move.value = 1 - opponentsMove.value;
+                console.log(intend + "The best value for us: " + move.value);
+            }
+        }
+        Utils.shuffle(moves);
+        moves.sort((m1, m2) => m2.value-m1.value);
+        // TODO make it less deterministic
+        return moves[0];
+    }
+
+    /**
+     * Evaluates the position for the specified player. 1 means the player
+     * wins, 0 means they lose, 0.5 is even.
+     */
+    evaluatePosition(game: Game, side: Side): number {
+        // make it simple. Victory = 1, defeat = 0, else 0.5
+        if (game.state == GameState.OVER) {
+            if (game.won == side) {
+                return 1.0;
+            } else {
+                return 0;
+            }
+        }
+        return 0.5;
     }
 }
