@@ -86,7 +86,7 @@ var AI = (function () {
         }
         common_1.Utils.shuffle(moves);
         moves.sort(function (m1, m2) { return m2.value - m1.value; });
-        return this.almostFirst(moves, 0.9, 3);
+        return depth == this.depth ? this.chooseMove(moves, 3) : moves[0];
     };
     /**
      * Evaluates the position for the specified player. 1 means the player
@@ -104,13 +104,38 @@ var AI = (function () {
         }
         return game.pieceCount[piece_1.Piece.side_to_string(side)] / 8;
     };
-    AI.prototype.almostFirst = function (moves, ratio, tries) {
-        for (var i = 0; i < tries; i++) {
-            if (Math.random() < ratio || moves.length == i + 1) {
+    /**
+     * Chooses the next move from a list of moves sorted by value. We don't
+     * want to always choose highest value, to make the game less predictable
+     * and less difficult. We want to choose the highest value if it's
+     * obviously the best but be more random if the difference is small.
+     */
+    AI.prototype.chooseMove = function (moves, n) {
+        console.log("Choosing from moves:");
+        n = Math.min(n, moves.length);
+        var c = {};
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            console.log(" " + i + ": " + moves[i].toString() + " " + moves[i].value);
+            c[i] = moves[i].value * moves[i].value;
+            sum += c[i];
+        }
+        if (sum == 0) {
+            console.log("Doom is certain, nothing we can do...");
+            return moves[0];
+        }
+        for (var i = 0; i < n; i++) {
+            c[i] /= sum;
+        }
+        var r = Math.random();
+        for (var i = 0; i < n; i++) {
+            if (r <= c[i]) {
+                console.log("Choosing " + i);
                 return moves[i];
             }
+            r -= c[i];
         }
-        return moves[tries - 1];
+        console.log("Error, nothing chosen");
     };
     return AI;
 }());

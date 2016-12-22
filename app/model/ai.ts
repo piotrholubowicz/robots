@@ -85,7 +85,7 @@ export class AI {
         }
         Utils.shuffle(moves);
         moves.sort((m1, m2) => m2.value-m1.value);
-        return this.almostFirst(moves, 0.9, 3);
+        return depth == this.depth ? this.chooseMove(moves, 3) : moves[0];
     }
 
     /**
@@ -104,12 +104,37 @@ export class AI {
         return game.pieceCount[Piece.side_to_string(side)] / 8;
     }
 
-    private almostFirst(moves: Move[], ratio: number, tries: number): Move {
-        for (let i=0; i<tries; i++) {
-            if (Math.random() < ratio || moves.length == i+1) {
+    /**
+     * Chooses the next move from a list of moves sorted by value. We don't
+     * want to always choose highest value, to make the game less predictable
+     * and less difficult. We want to choose the highest value if it's
+     * obviously the best but be more random if the difference is small.
+     */
+    private chooseMove(moves: Move[], n: number): Move {
+        console.log("Choosing from moves:");
+        n = Math.min(n, moves.length);
+        let c: {[idx: number]: number} = {};
+        let sum = 0;
+        for (let i=0; i<n; i++) {
+            console.log(" " + i + ": " + moves[i].toString() + " " + moves[i].value);
+            c[i] = moves[i].value * moves[i].value;
+            sum += c[i];
+        }
+        if (sum == 0) {
+            console.log("Doom is certain, nothing we can do...");
+            return moves[0];
+        }
+        for (let i=0; i<n; i++) {
+            c[i] /= sum;
+        }
+        let r = Math.random();
+        for (let i=0; i<n; i++) {
+            if (r <= c[i]) {
+                console.log("Choosing " + i);
                 return moves[i];
             }
+            r -= c[i];
         }
-        return moves[tries-1];
+        console.log("Error, nothing chosen");
     }
 }

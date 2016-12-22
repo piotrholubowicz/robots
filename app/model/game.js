@@ -161,7 +161,6 @@ var Game = (function () {
     };
     Game.prototype.putPieceOnBoard = function (c) {
         var side = this.selected.x == -1 ? piece_1.Side.WHITE : piece_1.Side.BLACK;
-        console.log("side: " + side);
         var movedPiece = this.captured[piece_1.Piece.side_to_string(side)][this.selected.y];
         this.pieces[c.x][c.y] = movedPiece;
         this.captured[piece_1.Piece.side_to_string(side)].splice(this.selected.y, 1);
@@ -181,10 +180,10 @@ var Game = (function () {
     Game.prototype.onPieceMoved = function (c, piece, wasCaptured) {
         this.whoseTurn = this.opposite(this.whoseTurn);
         if (piece.type == piece_1.Type.KING) {
-            if (c.x == 0 && piece.side == piece_1.Side.WHITE) {
+            if (c.x == 0 && piece.side == piece_1.Side.WHITE && !this.canBeCaptured(c)) {
                 this.gameOver(piece_1.Side.WHITE);
             }
-            else if (c.x == this.pieces.length - 1 && piece.side == piece_1.Side.BLACK) {
+            else if (c.x == this.pieces.length - 1 && piece.side == piece_1.Side.BLACK && !this.canBeCaptured(c)) {
                 this.gameOver(piece_1.Side.BLACK);
             }
         }
@@ -227,6 +226,32 @@ var Game = (function () {
                 }
             }
         }
+    };
+    Game.prototype.canBeCaptured = function (c) {
+        var _loop_1 = function(i) {
+            var _loop_2 = function(j) {
+                var x = c.x + i;
+                var y = c.y + j;
+                if (!this_1.isOutOfBounds(x, y)) {
+                    var piece = this_1.pieces[x][y];
+                    if (piece.side == this_1.opposite(this_1.getPiece(c).side)) {
+                        if (piece.movements().some(function (q) { return q[0] == -i && q[1] == -j; })) {
+                            return { value: true };
+                        }
+                    }
+                }
+            };
+            for (var j = -1; j <= 1; j++) {
+                var state_1 = _loop_2(j);
+                if (typeof state_1 === "object") return state_1;
+            }
+        };
+        var this_1 = this;
+        for (var i = -1; i <= 1; i++) {
+            var state_2 = _loop_1(i);
+            if (typeof state_2 === "object") return state_2.value;
+        }
+        return false;
     };
     Game.prototype.gameOver = function (winning) {
         console.log("game over");

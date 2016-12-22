@@ -156,7 +156,6 @@ export class Game  {
 
     private putPieceOnBoard(c: Coords) {
       let side = this.selected.x == -1 ? Side.WHITE : Side.BLACK;
-      console.log("side: " + side);
       let movedPiece = this.captured[Piece.side_to_string(side)][this.selected.y];
       this.pieces[c.x][c.y] = movedPiece;
       this.captured[Piece.side_to_string(side)].splice(this.selected.y, 1);
@@ -178,9 +177,9 @@ export class Game  {
     private onPieceMoved(c: Coords, piece: Piece, wasCaptured: boolean) {
       this.whoseTurn = this.opposite(this.whoseTurn);
       if (piece.type == Type.KING) {    
-        if (c.x == 0 && piece.side == Side.WHITE) {
+        if (c.x == 0 && piece.side == Side.WHITE && !this.canBeCaptured(c)) {
           this.gameOver(Side.WHITE);
-        } else if (c.x == this.pieces.length-1 && piece.side == Side.BLACK) {
+        } else if (c.x == this.pieces.length-1 && piece.side == Side.BLACK && !this.canBeCaptured(c)) {
           this.gameOver(Side.BLACK);
         }
       }
@@ -221,6 +220,24 @@ export class Game  {
           }
         }
       }
+    }
+
+    private canBeCaptured(c: Coords): boolean {
+      for (let i=-1; i<=1; i++) {
+        for (let j=-1; j<=1; j++) {
+          let x = c.x+i;
+          let y = c.y+j;
+          if (!this.isOutOfBounds(x,y)) {
+            let piece = this.pieces[x][y];
+            if (piece.side == this.opposite(this.getPiece(c).side)) {
+              if (piece.movements().some(q => q[0] == -i && q[1] == -j)) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+      return false;
     }
 
     private gameOver(winning: Side) {
