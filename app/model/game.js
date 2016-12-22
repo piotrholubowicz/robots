@@ -161,7 +161,6 @@ var Game = (function () {
     };
     Game.prototype.putPieceOnBoard = function (c) {
         var side = this.selected.x == -1 ? piece_1.Side.WHITE : piece_1.Side.BLACK;
-        console.log("side: " + side);
         var movedPiece = this.captured[piece_1.Piece.side_to_string(side)][this.selected.y];
         this.pieces[c.x][c.y] = movedPiece;
         this.captured[piece_1.Piece.side_to_string(side)].splice(this.selected.y, 1);

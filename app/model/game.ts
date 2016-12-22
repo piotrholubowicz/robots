@@ -156,7 +156,6 @@ export class Game  {
 
     private putPieceOnBoard(c: Coords) {
       let side = this.selected.x == -1 ? Side.WHITE : Side.BLACK;
-      console.log("side: " + side);
       let movedPiece = this.captured[Piece.side_to_string(side)][this.selected.y];
       this.pieces[c.x][c.y] = movedPiece;
       this.captured[Piece.side_to_string(side)].splice(this.selected.y, 1);
