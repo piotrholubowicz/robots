@@ -120,6 +120,10 @@ export class AI {
             c[i] = moves[i].value * moves[i].value;
             sum += c[i];
         }
+        if (sum == 0) {
+            console.log("Doom is certain, nothing we can do...");
+            return moves[0];
+        }
         for (let i=0; i<n; i++) {
             c[i] /= sum;
         }
